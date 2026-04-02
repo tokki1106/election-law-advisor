@@ -24,8 +24,9 @@ app.add_middleware(
 )
 
 
-from backend.routers import conversations, feedback
+from backend.routers import chat, conversations, feedback
 
+app.include_router(chat.router)
 app.include_router(conversations.router)
 app.include_router(feedback.router)
 
