@@ -232,7 +232,7 @@ election-law-advisor/
 ## 연락처
 
 - 개발자: nameyee1106@kakao.com
-- 커뮤니티: [네이미 챗봇 개발자 커뮤니티](https://cafe.naver.com/nameyee)
+- 커뮤니티: [챗봇 개발자 커뮤니티](https://cafe.naver.com/nameyee)
 
 ## 면책 조항
 
