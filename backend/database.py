@@ -21,6 +21,8 @@ async def init_db():
                 id          TEXT PRIMARY KEY,
                 title       TEXT,
                 mode        TEXT CHECK(mode IN ('citizen', 'candidate')),
+                pinned      INTEGER DEFAULT 0,
+                folder      TEXT,
                 created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP
             );
@@ -45,6 +47,14 @@ async def init_db():
                 created_at      DATETIME DEFAULT CURRENT_TIMESTAMP
             );
         """)
+        # Migrate: add pinned/folder columns if missing
+        cursor = await db.execute("PRAGMA table_info(conversations)")
+        cols = {row[1] for row in await cursor.fetchall()}
+        if "pinned" not in cols:
+            await db.execute("ALTER TABLE conversations ADD COLUMN pinned INTEGER DEFAULT 0")
+        if "folder" not in cols:
+            await db.execute("ALTER TABLE conversations ADD COLUMN folder TEXT")
+
         await db.commit()
     finally:
         await db.close()

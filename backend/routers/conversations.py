@@ -10,6 +10,11 @@ class ConversationCreate(BaseModel):
     mode: str  # 'citizen' | 'candidate'
 
 
+class ConversationUpdate(BaseModel):
+    pinned: bool | None = None
+    folder: str | None = None
+
+
 @router.post("")
 async def create_conversation(body: ConversationCreate):
     if body.mode not in ("citizen", "candidate"):
@@ -32,7 +37,7 @@ async def list_conversations():
     db = await get_db()
     try:
         cursor = await db.execute(
-            "SELECT id, title, mode, created_at, updated_at FROM conversations ORDER BY updated_at DESC"
+            "SELECT id, title, mode, pinned, folder, created_at, updated_at FROM conversations ORDER BY pinned DESC, updated_at DESC"
         )
         rows = await cursor.fetchall()
         return [dict(r) for r in rows]
@@ -45,7 +50,7 @@ async def get_conversation(conv_id: str):
     db = await get_db()
     try:
         cursor = await db.execute(
-            "SELECT id, title, mode, created_at FROM conversations WHERE id = ?",
+            "SELECT id, title, mode, pinned, folder, created_at FROM conversations WHERE id = ?",
             (conv_id,),
         )
         conv = await cursor.fetchone()
@@ -57,6 +62,31 @@ async def get_conversation(conv_id: str):
         )
         messages = await cursor.fetchall()
         return {"conversation": dict(conv), "messages": [dict(m) for m in messages]}
+    finally:
+        await db.close()
+
+
+@router.patch("/{conv_id}")
+async def update_conversation(conv_id: str, body: ConversationUpdate):
+    db = await get_db()
+    try:
+        updates = []
+        params = []
+        if body.pinned is not None:
+            updates.append("pinned = ?")
+            params.append(1 if body.pinned else 0)
+        if body.folder is not None:
+            updates.append("folder = ?")
+            params.append(body.folder if body.folder else None)
+        if not updates:
+            raise HTTPException(400, "nothing to update")
+        params.append(conv_id)
+        await db.execute(
+            f"UPDATE conversations SET {', '.join(updates)} WHERE id = ?",
+            params,
+        )
+        await db.commit()
+        return {"ok": True}
     finally:
         await db.close()
 

@@ -4,6 +4,8 @@ export interface Conversation {
   id: string;
   title: string | null;
   mode: string;
+  pinned: number;
+  folder: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -40,6 +42,14 @@ export async function getConversation(
 
 export async function deleteConversation(id: string): Promise<void> {
   await fetch(`${BASE}/api/conversations/${id}`, { method: 'DELETE' });
+}
+
+export async function updateConversation(id: string, data: { pinned?: boolean; folder?: string }): Promise<void> {
+  await fetch(`${BASE}/api/conversations/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
 }
 
 export async function submitFeedback(data: {
