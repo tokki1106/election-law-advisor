@@ -215,6 +215,10 @@ election-law-advisor/
 |---|---|---|
 | OPENROUTER_API_KEY | OpenRouter API 키 | 예 |
 
+## 문서
+
+상세 문서는 [문서 사이트](https://tokki1106.github.io/election-law-advisor/)에서 확인할 수 있습니다.
+
 ## 기여하기
 
 1. 이 저장소를 Fork 합니다
@@ -222,6 +226,13 @@ election-law-advisor/
 3. 변경사항을 커밋합니다 (`git commit -m 'feat: add amazing feature'`)
 4. 브랜치에 푸시합니다 (`git push origin feature/amazing-feature`)
 5. Pull Request를 생성합니다
+
+버그 제보나 기능 제안은 [Issues](https://github.com/tokki1106/election-law-advisor/issues)에 등록해주세요.
+
+## 연락처
+
+- 개발자: nameyee1106@kakao.com
+- 커뮤니티: [네이미 챗봇 개발자 커뮤니티](https://cafe.naver.com/nameyee)
 
 ## 면책 조항
 
@@ -238,3 +249,4 @@ election-law-advisor/
 - [legalize-kr](https://github.com/legalize-kr/legalize-kr) - 한국 법령 Git 저장소
 - [중앙선거관리위원회](https://www.nec.go.kr/) - 정치관계법 사례예시집
 - [OpenRouter](https://openrouter.ai) - LLM API 게이트웨이
+- [네이미 챗봇 개발자 커뮤니티](https://cafe.naver.com/nameyee) - 챗봇 개발 커뮤니티
