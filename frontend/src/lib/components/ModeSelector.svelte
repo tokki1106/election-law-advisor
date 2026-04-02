@@ -5,7 +5,10 @@
 </script>
 
 <div class="mode-selector">
-  <h2 class="title">어떤 도움이 필요하세요?</h2>
+  <div class="heading">
+    <h2 class="title">어떤 도움이 필요하세요?</h2>
+    <p class="subtitle">사용자 유형에 맞는 맞춤 답변을 드립니다</p>
+  </div>
   <div class="cards">
     <button class="card" onclick={() => onSelect('citizen')}>
       <span class="icon">&#x1F464;</span>
@@ -27,13 +30,24 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    gap: 32px;
+    gap: 40px;
+  }
+
+  .heading {
+    text-align: center;
   }
 
   .title {
-    font-size: 24px;
-    font-weight: 600;
+    font-size: 26px;
+    font-weight: 700;
     color: var(--text);
+    letter-spacing: -0.02em;
+  }
+
+  .subtitle {
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--text-muted);
   }
 
   .cards {

@@ -82,6 +82,15 @@
     await scrollToBottom();
   }
 
+  function parseCited(raw: string | undefined): string[] {
+    if (!raw) return [];
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {}
+    return raw.split(',').map(s => s.trim()).filter(Boolean);
+  }
+
   function buildTurn(messages: Message[]): ChatTurn {
     const turn: ChatTurn = {
       question: '',
@@ -103,16 +112,16 @@
           break;
         case 'conservative':
           turn.conservative = m.content;
-          turn.conservativeCited = m.cited_articles ? m.cited_articles.split(',').map(s => s.trim()).filter(Boolean) : [];
+          turn.conservativeCited = parseCited(m.cited_articles);
           break;
         case 'liberal':
           turn.liberal = m.content;
-          turn.liberalCited = m.cited_articles ? m.cited_articles.split(',').map(s => s.trim()).filter(Boolean) : [];
+          turn.liberalCited = parseCited(m.cited_articles);
           break;
         case 'consensus':
           turn.consensus = m.content;
           turn.riskLevel = m.risk_level || '';
-          turn.consensusCited = m.cited_articles ? m.cited_articles.split(',').map(s => s.trim()).filter(Boolean) : [];
+          turn.consensusCited = parseCited(m.cited_articles);
           turn.requestFeedback = true;
           break;
       }

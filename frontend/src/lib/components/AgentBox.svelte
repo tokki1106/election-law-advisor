@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { renderMarkdown } from '$lib/markdown';
+
   let { type, content, isActive, citedArticles }: {
     type: 'conservative' | 'liberal';
     content: string;
@@ -11,6 +13,8 @@
       ? { icon: '\u2696\uFE0F', label: '보수적 해석', bgVar: 'var(--conservative-bg)' }
       : { icon: '\uD83D\uDD4A\uFE0F', label: '관용적 해석', bgVar: 'var(--liberal-bg)' }
   );
+
+  const renderedContent = $derived(renderMarkdown(content));
 </script>
 
 <div class="agent-box" style:background={config.bgVar}>
@@ -21,11 +25,11 @@
       <span class="pulse-dot"></span>
     {/if}
   </div>
-  <div class="content">
+  <div class="content markdown-body">
     {#if !content && isActive}
       <span class="analyzing">분석 중...</span>
     {:else}
-      {content}
+      {@html renderedContent}
     {/if}
   </div>
   {#if citedArticles.length > 0}
@@ -39,18 +43,20 @@
 
 <style>
   .agent-box {
-    border-radius: 10px;
-    padding: 16px;
+    border-radius: 12px;
+    padding: 20px;
     margin-bottom: 8px;
+    transition: box-shadow 0.2s;
   }
 
   .header {
     display: flex;
     align-items: center;
-    gap: 6px;
-    margin-bottom: 10px;
+    gap: 8px;
+    margin-bottom: 12px;
     font-weight: 600;
     font-size: 14px;
+    letter-spacing: -0.01em;
   }
 
   .icon {
@@ -73,9 +79,9 @@
 
   .content {
     font-size: 14px;
-    line-height: 1.7;
-    white-space: pre-wrap;
-    word-break: break-word;
+    line-height: 1.75;
+    word-break: keep-all;
+    overflow-wrap: break-word;
   }
 
   .analyzing {
@@ -87,15 +93,18 @@
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    margin-top: 10px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
   }
 
   .tag {
     display: inline-block;
-    padding: 2px 8px;
-    background: rgba(0, 0, 0, 0.06);
-    border-radius: 4px;
+    padding: 3px 10px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 6px;
     font-size: 12px;
     color: var(--text-muted);
+    font-weight: 500;
   }
 </style>
