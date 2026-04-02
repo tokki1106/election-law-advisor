@@ -1,5 +1,5 @@
 import uuid
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from backend.database import get_db
 from backend.schemas import (
     ConversationCreate,
@@ -12,21 +12,28 @@ from backend.schemas import (
 router = APIRouter(prefix="/api/conversations", tags=["대화"])
 
 
+def _get_session_id(request: Request) -> str | None:
+    return request.headers.get("x-session-id")
+
+
 @router.post(
     "",
     response_model=ConversationCreateResponse,
     summary="새 대화 생성",
-    description="사용자 모드(citizen/candidate)를 선택하여 새 대화 세션을 생성합니다.",
+    description="사용자 모드(citizen/candidate)를 선택하여 새 대화 세션을 생성합니다. X-Session-Id 헤더 필요.",
 )
-async def create_conversation(body: ConversationCreate):
+async def create_conversation(body: ConversationCreate, request: Request):
     if body.mode not in ("citizen", "candidate"):
         raise HTTPException(400, "mode must be 'citizen' or 'candidate'")
+    session_id = _get_session_id(request)
+    if not session_id:
+        raise HTTPException(400, "X-Session-Id header required")
     conv_id = str(uuid.uuid4())
     db = await get_db()
     try:
         await db.execute(
-            "INSERT INTO conversations (id, mode) VALUES (?, ?)",
-            (conv_id, body.mode),
+            "INSERT INTO conversations (id, mode, session_id) VALUES (?, ?, ?)",
+            (conv_id, body.mode, session_id),
         )
         await db.commit()
         return {"id": conv_id, "mode": body.mode}
@@ -38,13 +45,17 @@ async def create_conversation(body: ConversationCreate):
     "",
     response_model=list[ConversationOut],
     summary="대화 목록 조회",
-    description="모든 대화 목록을 반환합니다. 고정된 대화가 먼저, 이후 최근 업데이트 순으로 정렬됩니다.",
+    description="본인 세션의 대화 목록만 반환합니다. X-Session-Id 헤더 필요.",
 )
-async def list_conversations():
+async def list_conversations(request: Request):
+    session_id = _get_session_id(request)
+    if not session_id:
+        return []
     db = await get_db()
     try:
         cursor = await db.execute(
-            "SELECT id, title, mode, pinned, folder, created_at, updated_at FROM conversations ORDER BY pinned DESC, updated_at DESC"
+            "SELECT id, title, mode, pinned, folder, created_at, updated_at FROM conversations WHERE session_id = ? ORDER BY pinned DESC, updated_at DESC",
+            (session_id,),
         )
         rows = await cursor.fetchall()
         return [dict(r) for r in rows]
@@ -56,14 +67,15 @@ async def list_conversations():
     "/{conv_id}",
     response_model=ConversationDetail,
     summary="대화 상세 조회",
-    description="특정 대화의 메타정보와 모든 메시지(user, conservative, liberal, consensus)를 반환합니다.",
+    description="특정 대화의 메타정보와 모든 메시지를 반환합니다. 본인 세션의 대화만 접근 가능합니다.",
 )
-async def get_conversation(conv_id: str):
+async def get_conversation(conv_id: str, request: Request):
+    session_id = _get_session_id(request)
     db = await get_db()
     try:
         cursor = await db.execute(
-            "SELECT id, title, mode, pinned, folder, created_at, updated_at FROM conversations WHERE id = ?",
-            (conv_id,),
+            "SELECT id, title, mode, pinned, folder, created_at, updated_at FROM conversations WHERE id = ? AND (session_id = ? OR session_id IS NULL)",
+            (conv_id, session_id),
         )
         conv = await cursor.fetchone()
         if not conv:
@@ -83,9 +95,18 @@ async def get_conversation(conv_id: str):
     summary="대화 수정",
     description="대화를 상단 고정하거나 폴더에 넣습니다.",
 )
-async def update_conversation(conv_id: str, body: ConversationUpdate):
+async def update_conversation(conv_id: str, body: ConversationUpdate, request: Request):
+    session_id = _get_session_id(request)
     db = await get_db()
     try:
+        # 본인 세션 대화인지 확인
+        cursor = await db.execute(
+            "SELECT id FROM conversations WHERE id = ? AND (session_id = ? OR session_id IS NULL)",
+            (conv_id, session_id),
+        )
+        if not await cursor.fetchone():
+            raise HTTPException(404, "conversation not found")
+
         updates = []
         params = []
         if body.pinned is not None:
@@ -110,12 +131,16 @@ async def update_conversation(conv_id: str, body: ConversationUpdate):
 @router.delete(
     "/{conv_id}",
     summary="대화 삭제",
-    description="대화와 관련 메시지를 모두 삭제합니다.",
+    description="대화와 관련 메시지를 모두 삭제합니다. 본인 세션의 대화만 삭제 가능합니다.",
 )
-async def delete_conversation(conv_id: str):
+async def delete_conversation(conv_id: str, request: Request):
+    session_id = _get_session_id(request)
     db = await get_db()
     try:
-        await db.execute("DELETE FROM conversations WHERE id = ?", (conv_id,))
+        await db.execute(
+            "DELETE FROM conversations WHERE id = ? AND (session_id = ? OR session_id IS NULL)",
+            (conv_id, session_id),
+        )
         await db.commit()
         return {"deleted": True}
     finally:

@@ -54,6 +54,8 @@ async def init_db():
             await db.execute("ALTER TABLE conversations ADD COLUMN pinned INTEGER DEFAULT 0")
         if "folder" not in cols:
             await db.execute("ALTER TABLE conversations ADD COLUMN folder TEXT")
+        if "session_id" not in cols:
+            await db.execute("ALTER TABLE conversations ADD COLUMN session_id TEXT")
 
         await db.commit()
     finally:

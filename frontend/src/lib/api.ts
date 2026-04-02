@@ -1,6 +1,11 @@
 import { base } from '$app/paths';
+import { getSessionId } from '$lib/session';
 
 const BASE = base;
+
+function sessionHeaders(): Record<string, string> {
+  return { 'X-Session-Id': getSessionId() };
+}
 
 export interface Conversation {
   id: string;
@@ -24,32 +29,39 @@ export interface Message {
 export async function createConversation(mode: string): Promise<{ id: string }> {
   const res = await fetch(`${BASE}/api/conversations`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...sessionHeaders() },
     body: JSON.stringify({ mode }),
   });
   return res.json();
 }
 
 export async function listConversations(): Promise<Conversation[]> {
-  const res = await fetch(`${BASE}/api/conversations`);
+  const res = await fetch(`${BASE}/api/conversations`, {
+    headers: sessionHeaders(),
+  });
   return res.json();
 }
 
 export async function getConversation(
   id: string
 ): Promise<{ conversation: Conversation; messages: Message[] }> {
-  const res = await fetch(`${BASE}/api/conversations/${id}`);
+  const res = await fetch(`${BASE}/api/conversations/${id}`, {
+    headers: sessionHeaders(),
+  });
   return res.json();
 }
 
 export async function deleteConversation(id: string): Promise<void> {
-  await fetch(`${BASE}/api/conversations/${id}`, { method: 'DELETE' });
+  await fetch(`${BASE}/api/conversations/${id}`, {
+    method: 'DELETE',
+    headers: sessionHeaders(),
+  });
 }
 
 export async function updateConversation(id: string, data: { pinned?: boolean; folder?: string }): Promise<void> {
   await fetch(`${BASE}/api/conversations/${id}`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...sessionHeaders() },
     body: JSON.stringify(data),
   });
 }
@@ -63,7 +75,7 @@ export async function submitFeedback(data: {
 }): Promise<void> {
   await fetch(`${BASE}/api/feedback`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...sessionHeaders() },
     body: JSON.stringify(data),
   });
 }
@@ -92,10 +104,21 @@ export function streamChat(
 
   fetch(`${BASE}/api/chat`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...sessionHeaders() },
     body: JSON.stringify({ conversation_id: conversationId, question }),
     signal: controller.signal,
   }).then(async (response) => {
+    if (response.status === 429) {
+      const data = await response.json();
+      callbacks.onConsensus({
+        content: data.detail || '요청 제한에 도달했습니다. 잠시 후 다시 시도해주세요.',
+        risk_level: 'caution',
+        cited_articles: [],
+        request_feedback: false,
+      });
+      return;
+    }
+
     const reader = response.body!.getReader();
     const decoder = new TextDecoder();
     let buffer = '';
