@@ -1,5 +1,6 @@
 import re
 import random
+import asyncio
 from typing import AsyncGenerator
 from dataclasses import dataclass, field
 from langchain_core.messages import AIMessageChunk
@@ -17,12 +18,33 @@ class StreamEvent:
     data: dict = field(default_factory=dict)
 
 
+_SENTINEL = object()
+
+
+async def _stream_agent(chain, params, event_prefix: str, queue: asyncio.Queue, result_holder: list):
+    """Stream a single agent's output into a shared queue."""
+    full_text = ""
+    await queue.put(StreamEvent(event=f"{event_prefix}_start"))
+    try:
+        async for chunk in chain.astream(params):
+            token = chunk.content if isinstance(chunk, AIMessageChunk) else str(chunk)
+            if token:
+                full_text += token
+                await queue.put(StreamEvent(event=f"{event_prefix}_token", data={"token": token}))
+    except Exception as e:
+        await queue.put(StreamEvent(event=f"{event_prefix}_token", data={"token": f"\n[오류: {e}]"}))
+
+    articles = _extract_articles(full_text)
+    await queue.put(StreamEvent(event=f"{event_prefix}_end", data={"cited_articles": articles}))
+    result_holder.append(full_text)
+
+
 async def run_agent_workflow(
     question: str,
     mode: str,
     conversation_id: str,
 ) -> AsyncGenerator[StreamEvent, None]:
-    """Agent workflow execution. Yields SSE events."""
+    """Agent workflow execution. Yields SSE events with parallel agent streaming."""
     retriever = get_retriever()
     llm = get_llm()
 
@@ -52,60 +74,43 @@ async def run_agent_workflow(
     if not case_context:
         case_context = "(관련 사례를 찾지 못했습니다)"
 
-    # 4. Conservative agent (streaming)
-    yield StreamEvent(event="conservative_start")
-    conservative_full = ""
+    agent_params = {
+        "question": question,
+        "mode": mode,
+        "context": law_context,
+        "cases": case_context,
+    }
+
+    # 4. Run conservative + liberal agents in PARALLEL
+    queue: asyncio.Queue = asyncio.Queue()
+    conservative_result: list[str] = []
+    liberal_result: list[str] = []
+
     conservative_chain = CONSERVATIVE_PROMPT | llm
-    async for chunk in conservative_chain.astream(
-        {
-            "question": question,
-            "mode": mode,
-            "context": law_context,
-            "cases": case_context,
-        }
-    ):
-        token = (
-            chunk.content if isinstance(chunk, AIMessageChunk) else str(chunk)
-        )
-        if token:
-            conservative_full += token
-            yield StreamEvent(
-                event="conservative_token", data={"token": token}
-            )
-
-    conservative_articles = _extract_articles(conservative_full)
-    yield StreamEvent(
-        event="conservative_end",
-        data={"cited_articles": conservative_articles},
-    )
-
-    # 5. Liberal agent (streaming)
-    yield StreamEvent(event="liberal_start")
-    liberal_full = ""
     liberal_chain = LIBERAL_PROMPT | llm
-    async for chunk in liberal_chain.astream(
-        {
-            "question": question,
-            "mode": mode,
-            "context": law_context,
-            "cases": case_context,
-        }
-    ):
-        token = (
-            chunk.content if isinstance(chunk, AIMessageChunk) else str(chunk)
+
+    async def run_both():
+        await asyncio.gather(
+            _stream_agent(conservative_chain, agent_params, "conservative", queue, conservative_result),
+            _stream_agent(liberal_chain, agent_params, "liberal", queue, liberal_result),
         )
-        if token:
-            liberal_full += token
-            yield StreamEvent(
-                event="liberal_token", data={"token": token}
-            )
+        await queue.put(_SENTINEL)
 
-    liberal_articles = _extract_articles(liberal_full)
-    yield StreamEvent(
-        event="liberal_end", data={"cited_articles": liberal_articles}
-    )
+    task = asyncio.create_task(run_both())
 
-    # 6. Consensus agent
+    # Yield interleaved events from both agents
+    while True:
+        item = await queue.get()
+        if item is _SENTINEL:
+            break
+        yield item
+
+    await task  # ensure no unhandled exceptions
+
+    conservative_full = conservative_result[0] if conservative_result else ""
+    liberal_full = liberal_result[0] if liberal_result else ""
+
+    # 5. Consensus agent (needs both opinions, runs after)
     consensus_chain = CONSENSUS_PROMPT | llm
     consensus_full = ""
     async for chunk in consensus_chain.astream(
@@ -116,9 +121,7 @@ async def run_agent_workflow(
             "liberal_opinion": liberal_full,
         }
     ):
-        token = (
-            chunk.content if isinstance(chunk, AIMessageChunk) else str(chunk)
-        )
+        token = chunk.content if isinstance(chunk, AIMessageChunk) else str(chunk)
         if token:
             consensus_full += token
 
@@ -127,14 +130,12 @@ async def run_agent_workflow(
     risk_match = re.search(r"\[RISK:(safe|caution|danger)\]", consensus_full)
     if risk_match:
         risk_level = risk_match.group(1)
-        consensus_full = consensus_full.replace(
-            risk_match.group(0), ""
-        ).strip()
+        consensus_full = consensus_full.replace(risk_match.group(0), "").strip()
 
     consensus_articles = _extract_articles(consensus_full)
-    all_articles = list(
-        set(conservative_articles + liberal_articles + consensus_articles)
-    )
+    conservative_articles = _extract_articles(conservative_full)
+    liberal_articles = _extract_articles(liberal_full)
+    all_articles = list(set(conservative_articles + liberal_articles + consensus_articles))
 
     request_feedback = random.random() < 0.3
 

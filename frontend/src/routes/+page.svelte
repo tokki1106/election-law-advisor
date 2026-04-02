@@ -19,12 +19,14 @@
     chatHistory,
     currentTurn,
     isStreaming,
-    activePhase,
+    conservativeActive,
+    liberalActive,
     conversationMode,
     resetChat,
   } from '$lib/stores/chat';
   import type { ChatTurn } from '$lib/stores/chat';
-  import { theme, toggleTheme, initTheme } from '$lib/stores/theme';
+  import { initTheme } from '$lib/stores/theme';
+  import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 
   let inputText = $state('');
   let chatAreaEl: HTMLDivElement | undefined = $state();
@@ -162,15 +164,15 @@
       feedbackGiven: null,
     };
     currentTurn.set(turn);
-    activePhase.set('idle');
+    conservativeActive.set(false);
+    liberalActive.set(false);
     await scrollToBottom();
 
     const convId = $activeConversationId;
 
     streamChat(convId, question, {
       onConservativeStart: () => {
-        activePhase.set('conservative');
-        currentTurn.update(t => t ? { ...t } : t);
+        conservativeActive.set(true);
         scrollToBottom();
       },
       onConservativeToken: (token: string) => {
@@ -181,15 +183,14 @@
         scrollToBottom();
       },
       onConservativeEnd: (data: { cited_articles: string[] }) => {
+        conservativeActive.set(false);
         currentTurn.update(t => {
           if (!t) return t;
           return { ...t, conservativeCited: data.cited_articles || [] };
         });
-        scrollToBottom();
       },
       onLiberalStart: () => {
-        activePhase.set('liberal');
-        currentTurn.update(t => t ? { ...t } : t);
+        liberalActive.set(true);
         scrollToBottom();
       },
       onLiberalToken: (token: string) => {
@@ -200,25 +201,13 @@
         scrollToBottom();
       },
       onLiberalEnd: (data: { cited_articles: string[] }) => {
+        liberalActive.set(false);
         currentTurn.update(t => {
           if (!t) return t;
           return { ...t, liberalCited: data.cited_articles || [] };
         });
-        scrollToBottom();
       },
       onConsensus: (data) => {
-        activePhase.set('consensus');
-        currentTurn.update(t => {
-          if (!t) return t;
-          return {
-            ...t,
-            consensus: data.content,
-            riskLevel: data.risk_level,
-            consensusCited: data.cited_articles || [],
-            requestFeedback: data.request_feedback,
-          };
-        });
-
         currentTurn.update(t => {
           if (t) {
             chatHistory.update(h => [...h, {
@@ -233,7 +222,8 @@
         });
 
         isStreaming.set(false);
-        activePhase.set('idle');
+        conservativeActive.set(false);
+        liberalActive.set(false);
         refreshConversations();
         scrollToBottom();
       },
@@ -270,9 +260,9 @@
               {modeLabels[$conversationMode] || $conversationMode}
             </span>
           {/if}
-          <button class="theme-toggle" onclick={toggleTheme} title={$theme === 'light' ? '다크 모드' : '라이트 모드'}>
-            {$theme === 'light' ? '🌙' : '☀️'}
-          </button>
+          <div class="theme-toggle-wrap">
+            <ThemeToggle />
+          </div>
         </div>
 
         <div class="chat-area" bind:this={chatAreaEl}>
@@ -291,8 +281,8 @@
               <ChatMessage
                 turn={$currentTurn}
                 conversationId={$activeConversationId}
-                conservativeActive={$activePhase === 'conservative'}
-                liberalActive={$activePhase === 'liberal'}
+                conservativeActive={$conservativeActive}
+                liberalActive={$liberalActive}
                 turnIndex={$chatHistory.length}
               />
             {/if}
@@ -327,9 +317,9 @@
     {/if}
 
     {#if !$activeConversationId}
-      <button class="theme-toggle floating" onclick={toggleTheme} title={$theme === 'light' ? '다크 모드' : '라이트 모드'}>
-        {$theme === 'light' ? '🌙' : '☀️'}
-      </button>
+      <div class="theme-toggle-floating">
+        <ThemeToggle />
+      </div>
     {/if}
   </main>
 </div>
@@ -373,33 +363,18 @@
     color: var(--text-muted);
   }
 
-  .theme-toggle {
+  .theme-toggle-wrap {
     position: absolute;
     right: 16px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 18px;
-    width: 34px;
-    height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    transition: background 0.15s;
   }
 
-  .theme-toggle:hover {
-    background: var(--hover);
-  }
-
-  .theme-toggle.floating {
+  .theme-toggle-floating {
     position: fixed;
     top: 16px;
     right: 16px;
     z-index: 100;
-    background: var(--bg-elevated);
-    border: 1px solid var(--border);
-    box-shadow: 0 2px 8px var(--shadow);
   }
 
   .chat-area {

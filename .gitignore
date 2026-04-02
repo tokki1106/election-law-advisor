@@ -1,11 +1,37 @@
+# 환경 변수 (API 키)
 .env
-node_modules/
+.env.*
+
+# Python
+venv/
 __pycache__/
 *.pyc
+*.pyo
+*.egg-info/
+dist/
+
+# 데이터 (인덱싱 결과물 - 로컬 생성)
 backend/data/chroma_db/
 backend/data/bm25_index/
 backend/data/legal.db
 backend/data/laws/
+
+# Node
+node_modules/
 .svelte-kit/
 build/
-venv/
+frontend/build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Playwright
+.playwright-mcp/

@@ -63,14 +63,15 @@
     padding: 32px 28px;
     border: 2px solid var(--border);
     border-radius: 12px;
-    background: white;
+    background: var(--bg-elevated);
     width: 240px;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
   }
 
   .card:hover {
     border-color: var(--accent);
-    box-shadow: 0 2px 12px rgba(218, 119, 86, 0.12);
+    background: var(--accent-light);
+    box-shadow: 0 2px 16px var(--shadow);
   }
 
   .icon {

@@ -16,15 +16,15 @@ export interface ChatTurn {
 export const chatHistory = writable<ChatTurn[]>([]);
 export const currentTurn = writable<ChatTurn | null>(null);
 export const isStreaming = writable(false);
-export const activePhase = writable<
-  'idle' | 'conservative' | 'liberal' | 'consensus'
->('idle');
+export const conservativeActive = writable(false);
+export const liberalActive = writable(false);
 export const conversationMode = writable<string | null>(null);
 
 export function resetChat() {
   chatHistory.set([]);
   currentTurn.set(null);
   isStreaming.set(false);
-  activePhase.set('idle');
+  conservativeActive.set(false);
+  liberalActive.set(false);
   conversationMode.set(null);
 }
