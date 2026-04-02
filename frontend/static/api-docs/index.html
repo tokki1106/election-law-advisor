@@ -2,392 +2,181 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>선거법 RAG API</title>
-<meta name="description" content="한국 선거법 조문 + 사례예시집 검색 API — 인증 불필요, 무료 공개">
+<meta name="description" content="한국 선거법 조문 + 사례예시집 검색 API. 인증 불필요, 무료 공개.">
 <link rel="icon" type="image/png" href="/favicon.png">
 <meta property="og:type" content="website">
-<meta property="og:title" content="선거법 RAG API — Election Law Advisor">
+<meta property="og:title" content="선거법 RAG API">
 <meta property="og:description" content="한국 선거법 조문 + 사례예시집 1,877건 검색 API. 인증 불필요, 무료 공개.">
 <meta property="og:image" content="https://zugu.io/election/og-image.png">
-<meta property="og:url" content="/api-docs/">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="선거법 RAG API">
-<meta name="twitter:image" content="https://zugu.io/election/og-image.png">
-<link rel="preconnect" href="https://cdn.jsdelivr.net">
-<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css" rel="stylesheet">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
-:root {
-  --bg: #f2ead3;
-  --bg-soft: #ede4cb;
-  --surface: #f7ecd2;
-  --ink: #3b2f20;
-  --ink-muted: #7a6b54;
-  --border: #c2a676;
-  --accent: #9b7c4d;
-  --green: #2f6b4e;
-  --hover-bg: #3b2f20;
-  --hover-text: #f2ead3;
-  --code-bg: #3b2f20;
-  --code-text: #f2ead3;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-html, body {
-  font-family: "Pretendard Variable", -apple-system, sans-serif;
-  background: var(--bg);
-  color: var(--ink);
-  line-height: 1.6;
-  min-height: 100vh;
-}
-
-.container {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 48px 24px 80px;
-}
-
-h1 {
-  font-size: 28px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  margin-bottom: 8px;
-}
-
-.subtitle {
-  font-size: 15px;
-  color: var(--ink-muted);
-  margin-bottom: 40px;
-}
-
-.stats {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 40px;
-  flex-wrap: wrap;
-}
-
-.stat {
-  background: var(--surface);
-  border: 2px solid var(--border);
-  border-radius: 10px;
-  padding: 14px 20px;
-  flex: 1;
-  min-width: 140px;
-  box-shadow: 4px 4px 0 rgba(59,47,32,0.1);
-}
-
-.stat-num {
-  font-size: 24px;
-  font-weight: 800;
-  color: var(--accent);
-}
-
-.stat-label {
-  font-size: 13px;
-  color: var(--ink-muted);
-}
-
-.card {
-  background: var(--surface);
-  border: 3px solid var(--border);
-  border-radius: 14px;
-  padding: 28px;
-  margin-bottom: 20px;
-  box-shadow: 8px 8px 0 rgba(59,47,32,0.12);
-  transition: transform 80ms, box-shadow 80ms;
-}
-
-.card:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 10px 10px 0 rgba(59,47,32,0.15);
-}
-
-.card-title {
-  font-size: 17px;
-  font-weight: 700;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.badge {
-  font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-weight: 600;
-}
-
-.badge-open { background: #d4edda; color: var(--green); }
-.badge-post { background: #fff3cd; color: #856404; }
-
-.card p, .card li {
-  font-size: 14px;
-  color: var(--ink-muted);
-  line-height: 1.7;
-}
-
-.card ul {
-  padding-left: 20px;
-  margin: 8px 0;
-}
-
-pre {
-  background: var(--code-bg);
-  color: var(--code-text);
-  border-radius: 10px;
-  padding: 16px 20px;
-  overflow-x: auto;
-  font-size: 13px;
-  line-height: 1.6;
-  margin: 12px 0;
-  position: relative;
-}
-
-code {
-  font-family: "SF Mono", Menlo, monospace;
-}
-
-.copy-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: var(--accent);
-  color: white;
-  border: none;
-  padding: 4px 12px;
-  border-radius: 6px;
-  font-size: 12px;
-  cursor: pointer;
-  font-family: inherit;
-  transition: opacity 0.15s;
-}
-
-.copy-btn:hover { opacity: 0.8; }
-.copy-btn.copied { background: var(--green); }
-
-.endpoint {
-  margin-bottom: 16px;
-}
-
-.endpoint-method {
-  display: inline-block;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 4px;
-  margin-right: 6px;
-}
-
-.method-get { background: #d4edda; color: var(--green); }
-.method-post { background: #fff3cd; color: #856404; }
-
-.endpoint-path {
-  font-family: "SF Mono", Menlo, monospace;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.endpoint-desc {
-  font-size: 13px;
-  color: var(--ink-muted);
-  margin-top: 2px;
-}
-
-.section-title {
-  font-size: 20px;
-  font-weight: 700;
-  margin: 48px 0 20px;
-  letter-spacing: -0.02em;
-}
-
-.notice {
-  background: #fff8e1;
-  border: 2px solid #f0d58c;
-  border-radius: 10px;
-  padding: 16px 20px;
-  font-size: 13px;
-  color: var(--ink-muted);
-  margin: 24px 0;
-}
-
-.notice strong { color: var(--ink); }
-
-.footer {
-  margin-top: 60px;
-  padding-top: 24px;
-  border-top: 2px solid var(--border);
-  font-size: 13px;
-  color: var(--ink-muted);
-}
-
-.footer a {
-  color: var(--accent);
-  text-decoration: none;
-}
-
-.footer a:hover { text-decoration: underline; }
-
-.link-row {
-  display: flex;
-  gap: 16px;
-  margin-top: 8px;
-}
-
-@media (max-width: 600px) {
-  .container { padding: 32px 16px 60px; }
-  h1 { font-size: 24px; }
-  .stats { flex-direction: column; }
-  .card { padding: 20px; }
-}
+:root{--bg:#f2ead3;--surface:#f7ecd2;--ink:#3b2f20;--ink-soft:#4f3f2b;--muted:#897457;--green:#2f6b4e;--border:#c2a676;--shadow:12px 12px 0 #3b2f20;--motion-fast:0.15s}
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;font-family:"Pretendard Variable","Pretendard",system-ui,sans-serif;font-weight:500;letter-spacing:-0.02em;background:var(--bg);color:var(--ink);line-height:1.5;background-image:linear-gradient(rgba(59,47,32,0.035) 1px,transparent 1px),linear-gradient(90deg,rgba(59,47,32,0.035) 1px,transparent 1px);background-size:30px 30px;display:flex;justify-content:center;padding:16px 20px 28px}
+.shell{max-width:560px;width:100%;padding-top:24px;padding-bottom:40px;animation:fadeUp .5s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--surface);border:3px solid var(--ink);box-shadow:var(--shadow);overflow:hidden}
+.card-header{padding:24px 24px 20px;border-bottom:2px solid var(--ink)}
+.header-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card-header h1{font-size:1.15rem;font-weight:800;letter-spacing:-0.03em}
+.card-desc{margin:10px 0 0;font-size:.92rem;color:var(--ink)}
+.card-sub{margin:4px 0 0;font-size:.76rem;color:var(--muted);font-weight:500}
+.card-body{padding:28px 24px 40px;display:flex;flex-direction:column;gap:24px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 0;text-align:center}
+.stat-value{font-size:1.25rem;font-weight:700;letter-spacing:-0.02em}
+.stat-label{font-size:.72rem;color:#6d593f;margin-top:3px;font-weight:600;white-space:nowrap}
+.divider{border:none;border-top:2px solid var(--ink);margin:0}
+.section{display:flex;flex-direction:column;gap:6px}
+.section-title{margin:0 0 4px;font-size:1.05rem;font-weight:800;letter-spacing:-0.03em}
+.section-title small{font-weight:600;color:#6d593f;font-size:.8rem}
+.section-desc{margin:0;font-size:.85rem;color:var(--ink);line-height:1.6}
+.field-grid{display:grid;grid-template-columns:1fr auto;gap:6px 8px;align-items:start}
+.field-grid code{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.82rem;font-weight:500;color:#1a1207;padding:12px 14px;background:var(--bg);border:2px solid var(--ink);white-space:pre-wrap;line-height:1.6;display:block}
+.copy-btn{padding:4px 10px;border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);transition:transform 80ms,box-shadow 80ms,background var(--motion-fast);background:#fffdf7;font-size:.76rem;font-weight:700;color:var(--ink);cursor:pointer;font-family:inherit;white-space:nowrap;align-self:start;margin-top:12px}
+.copy-btn:hover{background:var(--ink);color:var(--bg)}
+.copy-btn:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--ink)}
+.link-btn{display:inline-block;padding:4px 10px;border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);transition:transform 80ms,box-shadow 80ms,background var(--motion-fast);background:#fffdf7;font-size:.76rem;font-weight:700;color:var(--ink);cursor:pointer;font-family:inherit;text-decoration:none}
+.link-btn:hover{background:var(--ink);color:var(--bg)}
+.data-list{margin:4px 0;padding-left:1.2rem}
+.data-list li{font-size:.85rem;color:var(--ink);margin-bottom:4px;line-height:1.6}
+.param-table{width:100%;font-size:.82rem;border-collapse:collapse}
+.param-table th{text-align:left;padding:6px 0;font-weight:700;border-bottom:2px solid var(--ink);font-size:.78rem}
+.param-table td{padding:6px 0;border-bottom:1px solid var(--border)}
+.param-table code{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.78rem;background:#fff;padding:1px 6px;border:1px solid var(--ink)}
+.notice{font-size:.82rem;color:var(--ink-soft);line-height:1.6}
+.notice strong{color:var(--ink)}
+.statusline{margin:24px 0 0;text-align:right;font-size:.72rem;color:var(--ink);font-weight:600}
+.statusline a{color:var(--ink);text-decoration:none}
+.statusline a:hover{text-decoration:underline}
+.statusline p{margin:2px 0}
+@media(max-width:640px){body{padding:10px 16px 20px}.shell{padding-top:12px;padding-bottom:28px}.card{box-shadow:8px 8px 0 var(--ink)}.card-header{padding:20px 18px 16px}.card-body{padding:18px;gap:16px}.stats{grid-template-columns:repeat(2,1fr);gap:12px 0}.stat-value{font-size:1.1rem}}
 </style>
 </head>
 <body>
 
-<div class="container">
+<main class="shell">
+<div class="card">
 
-<h1>선거법 RAG API</h1>
-<p class="subtitle">한국 선거법 조문 + 사례예시집 검색 API — 인증 불필요, 무료 공개</p>
-
-<div class="stats" id="stats">
-  <div class="stat"><div class="stat-num" id="stat-total">-</div><div class="stat-label">전체 청크</div></div>
-  <div class="stat"><div class="stat-num" id="stat-law">-</div><div class="stat-label">법률 조문</div></div>
-  <div class="stat"><div class="stat-num" id="stat-case">-</div><div class="stat-label">사례예시집</div></div>
-  <div class="stat"><div class="stat-num" id="stat-ref">-</div><div class="stat-label">상호참조</div></div>
+<div class="card-header">
+<div class="header-row">
+<h1>&#9878;&#65039; 선거법 RAG API</h1>
+<a href="/docs" class="link-btn">Swagger</a>
+</div>
+<p class="card-desc">한국 선거법 조문 + 사례예시집 검색 API</p>
+<p class="card-sub">인증, 결제, API 키 발급 필요 없음. 검색 쿼리 로깅 안 함.</p>
 </div>
 
-<div class="card">
-  <div class="card-title">검색 범위</div>
-  <ul>
-    <li>공직선거법 (법률 + 시행령 + 시행규칙)</li>
-    <li>정치자금법 (법률 + 시행령 + 시행규칙)</li>
-    <li>정당법 (법률 + 시행령 + 시행규칙)</li>
-    <li>공직선거관리규칙</li>
-    <li>중앙선관위 정치관계법 사례예시집 (838건)</li>
-  </ul>
-  <p style="margin-top:10px">Hybrid Retrieval: BM25 키워드 + 벡터 시맨틱 + RRF 병합 + 조문 상호참조 자동 확장</p>
+<div class="card-body">
+
+<div class="stats">
+<div><div class="stat-value" id="s-total">-</div><div class="stat-label">전체 청크</div></div>
+<div><div class="stat-value" id="s-law">-</div><div class="stat-label">법률 조문</div></div>
+<div><div class="stat-value" id="s-case">-</div><div class="stat-label">사례예시집</div></div>
+<div><div class="stat-value" id="s-ref">-</div><div class="stat-label">상호참조</div></div>
 </div>
 
-<h2 class="section-title">API 엔드포인트</h2>
+<hr class="divider">
 
-<div class="card">
-  <div class="card-title"><span class="endpoint-method method-post">POST</span> /api/search <span class="badge badge-open">인증 불필요</span></div>
-  <p>선거 관련 법률 조문과 사례를 검색합니다.</p>
+<div class="section">
+<h2 class="section-title">검색 범위</h2>
+<ul class="data-list">
+<li>공직선거법 (법률 + 시행령 + 시행규칙)</li>
+<li>정치자금법 (법률 + 시행령 + 시행규칙)</li>
+<li>정당법 (법률 + 시행령 + 시행규칙)</li>
+<li>공직선거관리규칙</li>
+<li>중앙선관위 정치관계법 사례예시집 (838건)</li>
+</ul>
+<p class="section-desc">Hybrid Retrieval: BM25 키워드 + 벡터 시맨틱 + RRF 병합 + 조문 상호참조 자동 확장</p>
+</div>
 
-  <pre><code>{
+<hr class="divider">
+
+<div class="section">
+<h2 class="section-title">POST /api/search <small>인증 불필요</small></h2>
+<p class="section-desc">선거 관련 법률 조문과 사례를 검색합니다.</p>
+<div class="field-grid">
+<code>{
   "query": "기부행위 제한",
   "top_k": 5,
   "expand_refs": true
-}</code><button class="copy-btn" onclick="copyCode(this)">복사</button></pre>
+}</code>
+<button class="copy-btn" onclick="copyCode(this)">복사</button>
+</div>
+</div>
 
-  <p style="margin-top:12px"><strong>curl 예시:</strong></p>
-  <pre><code id="curl-example">curl -X POST https://election.zugu.io/api/search \
+<div class="section">
+<h2 class="section-title">curl 예시</h2>
+<div class="field-grid">
+<code>curl -X POST https://election.zugu.io/api/search \
   -H "Content-Type: application/json" \
-  -d '{"query":"기부행위 제한","top_k":5,"expand_refs":true}'</code><button class="copy-btn" onclick="copyCode(this)">복사</button></pre>
-
-  <p style="margin-top:12px"><strong>응답 예시:</strong></p>
-  <pre><code>{
-  "query": "기부행위 제한",
-  "total": 7,
-  "results": [
-    {
-      "id": "공직선거법_법률__제112조",
-      "text": "제112조 (기부행위의 정의) ...",
-      "metadata": {
-        "law_name": "공직선거법_법률",
-        "article": "제112조",
-        "type": "law"
-      }
-    },
-    {
-      "id": "case__0497",
-      "text": "예비후보자가 군청, 경찰서 등...",
-      "metadata": {
-        "judgment": "prohibited",
-        "type": "case_example"
-      }
-    }
-  ]
-}</code></pre>
+  -d '{"query":"기부행위 제한","top_k":5}'</code>
+<button class="copy-btn" onclick="copyCode(this)">복사</button>
+</div>
 </div>
 
-<div class="card">
-  <div class="card-title"><span class="endpoint-method method-get">GET</span> /api/search/stats <span class="badge badge-open">인증 불필요</span></div>
-  <p>인덱싱된 법률 데이터 통계를 반환합니다.</p>
-  <pre><code>curl https://election.zugu.io/api/search/stats</code><button class="copy-btn" onclick="copyCode(this)">복사</button></pre>
-</div>
+<hr class="divider">
 
-<div class="card">
-  <div class="card-title"><span class="endpoint-method method-get">GET</span> /api/health</div>
-  <p>서버 상태 확인</p>
-</div>
-
+<div class="section">
 <h2 class="section-title">파라미터</h2>
-
-<div class="card">
-  <table style="width:100%; font-size:14px; border-collapse:collapse;">
-    <tr style="border-bottom:2px solid var(--border);">
-      <th style="text-align:left; padding:8px 0;">파라미터</th>
-      <th style="text-align:left; padding:8px 0;">기본값</th>
-      <th style="text-align:left; padding:8px 0;">설명</th>
-    </tr>
-    <tr><td style="padding:6px 0;"><code>query</code></td><td>필수</td><td>검색 쿼리 (한국어)</td></tr>
-    <tr><td style="padding:6px 0;"><code>top_k</code></td><td>10</td><td>반환 결과 수 (1~50)</td></tr>
-    <tr><td style="padding:6px 0;"><code>expand_refs</code></td><td>true</td><td>상호참조 조문 자동 확장</td></tr>
-  </table>
+<table class="param-table">
+<tr><th>파라미터</th><th>기본값</th><th>설명</th></tr>
+<tr><td><code>query</code></td><td>필수</td><td>검색 쿼리 (한국어)</td></tr>
+<tr><td><code>top_k</code></td><td>10</td><td>반환 결과 수</td></tr>
+<tr><td><code>expand_refs</code></td><td>true</td><td>상호참조 조문 확장</td></tr>
+</table>
 </div>
 
-<h2 class="section-title">AI 에이전트 연동</h2>
+<hr class="divider">
 
-<div class="card">
-  <div class="card-title">Claude / ChatGPT / Gemini</div>
-  <p>아래 프롬프트를 AI에게 전달하면 됩니다:</p>
-  <pre><code id="ai-prompt">선거법 관련 질문에 답할 때 https://election.zugu.io/api/search 를
+<div class="section">
+<h2 class="section-title">AI 에이전트 연동 <small>Claude / ChatGPT</small></h2>
+<p class="section-desc">아래 프롬프트를 AI에게 전달하면 됩니다:</p>
+<div class="field-grid">
+<code>선거법 관련 질문에 답할 때 https://election.zugu.io/api/search 를
 POST 호출하여 관련 법 조문을 검색한 뒤 근거로 활용해줘.
-요청 형식: {"query": "검색어", "top_k": 5, "expand_refs": true}</code><button class="copy-btn" onclick="copyCode(this)">복사</button></pre>
+요청 형식: {"query": "검색어", "top_k": 5, "expand_refs": true}</code>
+<button class="copy-btn" onclick="copyCode(this)">복사</button>
+</div>
 </div>
 
-<div class="notice">
-  <strong>개인정보 보호:</strong> 이 API는 IP 주소, 검색 쿼리를 로깅하지 않습니다. 인증 없이 익명으로 사용 가능합니다. LLM 호출이 포함되지 않으므로 비용이 발생하지 않습니다.
+<hr class="divider">
+
+<div class="section">
+<h2 class="section-title">GET /api/search/stats</h2>
+<div class="field-grid">
+<code>curl https://election.zugu.io/api/search/stats</code>
+<button class="copy-btn" onclick="copyCode(this)">복사</button>
+</div>
 </div>
 
-<div class="footer">
-  <div class="link-row">
-    <a href="https://github.com/tokki1106/election-law-advisor">GitHub</a>
-    <a href="https://tokki1106.github.io/election-law-advisor/">문서</a>
-    <a href="/docs">Swagger UI</a>
-    <a href="/redoc">ReDoc</a>
-    <a href="https://zugu.io/election/">웹 서비스</a>
-  </div>
-  <p style="margin-top:12px">
-    법률 데이터 출처: <a href="https://github.com/legalize-kr/legalize-kr">legalize-kr</a> |
-    사례예시집: <a href="https://www.nec.go.kr/">중앙선거관리위원회</a>
-  </p>
-  <p style="margin-top:4px">문의: nameyee1106@kakao.com | <a href="https://cafe.naver.com/nameyee">커뮤니티</a></p>
-</div>
+<hr class="divider">
+
+<p class="notice"><strong>개인정보 보호:</strong> IP 주소, 검색 쿼리를 로깅하지 않습니다. 인증 없이 익명 사용. LLM 호출 없음, 비용 없음.</p>
 
 </div>
+</div>
+
+<div class="statusline">
+<p>
+<a href="https://github.com/tokki1106/election-law-advisor">GitHub</a> &middot;
+<a href="https://tokki1106.github.io/election-law-advisor/">문서</a> &middot;
+<a href="/docs">Swagger</a> &middot;
+<a href="/redoc">ReDoc</a> &middot;
+<a href="https://zugu.io/election/">웹 서비스</a>
+</p>
+<p>법률 데이터: <a href="https://github.com/legalize-kr/legalize-kr">legalize-kr</a> &middot; 사례예시집: <a href="https://www.nec.go.kr/">중앙선관위</a></p>
+<p>nameyee1106@kakao.com &middot; <a href="https://cafe.naver.com/nameyee">커뮤니티</a></p>
+</div>
+</main>
 
 <script>
-function copyCode(btn) {
-  const code = btn.parentElement.querySelector('code');
-  navigator.clipboard.writeText(code.textContent.trim());
-  btn.textContent = '복사됨';
-  btn.classList.add('copied');
-  setTimeout(() => { btn.textContent = '복사'; btn.classList.remove('copied'); }, 1500);
-}
-
-fetch('/api/search/stats')
-  .then(r => r.json())
-  .then(d => {
-    document.getElementById('stat-total').textContent = d.total_chunks.toLocaleString();
-    document.getElementById('stat-law').textContent = d.law_chunks.toLocaleString();
-    document.getElementById('stat-case').textContent = d.case_example_chunks.toLocaleString();
-    document.getElementById('stat-ref').textContent = d.cross_references.toLocaleString();
-  })
-  .catch(() => {});
+function copyCode(btn){var c=btn.parentElement.querySelector('code');navigator.clipboard.writeText(c.textContent.trim());btn.textContent='복사됨';setTimeout(function(){btn.textContent='복사'},1500)}
+fetch('/api/search/stats').then(function(r){return r.json()}).then(function(d){document.getElementById('s-total').textContent=d.total_chunks.toLocaleString();document.getElementById('s-law').textContent=d.law_chunks.toLocaleString();document.getElementById('s-case').textContent=d.case_example_chunks.toLocaleString();document.getElementById('s-ref').textContent=d.cross_references.toLocaleString()}).catch(function(){})
 </script>
 
 </body>
