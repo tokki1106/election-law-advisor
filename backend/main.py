@@ -6,6 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from backend.database import init_db
 from backend.schemas import HealthResponse
+from backend.auth import APIKeyMiddleware
 
 load_dotenv()
 
@@ -34,11 +35,13 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(APIKeyMiddleware)
 
 from backend.routers import chat, conversations, feedback, search
 
