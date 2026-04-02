@@ -34,7 +34,7 @@ PUBLIC_PREFIXES = (
 
 # Rate limit 설정: /api/chat → IP당 1분 2회
 RATE_LIMIT_WINDOW = 60  # 초
-RATE_LIMIT_MAX = 2  # 최대 요청 수
+RATE_LIMIT_MAX = 3  # 최대 요청 수
 RATE_LIMITED_PATHS = {"/api/chat"}
 
 
