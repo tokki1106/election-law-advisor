@@ -1,4 +1,6 @@
-const BASE = '';
+import { base } from '$app/paths';
+
+const BASE = base;
 
 export interface Conversation {
   id: string;

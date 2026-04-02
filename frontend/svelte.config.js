@@ -10,6 +10,9 @@ const config = {
 			assets: 'build',
 			fallback: 'index.html',
 		}),
+		paths: {
+			base: '/election',
+		},
 	},
 };
 
