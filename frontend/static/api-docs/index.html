@@ -273,7 +273,7 @@ code {
 }</code><button class="copy-btn" onclick="copyCode(this)">복사</button></pre>
 
   <p style="margin-top:12px"><strong>curl 예시:</strong></p>
-  <pre><code id="curl-example">curl -X POST https://zugu.io:8000/api/search \
+  <pre><code id="curl-example">curl -X POST https://zugu.io/election/api/search \
   -H "Content-Type: application/json" \
   -d '{"query":"기부행위 제한","top_k":5,"expand_refs":true}'</code><button class="copy-btn" onclick="copyCode(this)">복사</button></pre>
 
@@ -306,7 +306,7 @@ code {
 <div class="card">
   <div class="card-title"><span class="endpoint-method method-get">GET</span> /api/search/stats <span class="badge badge-open">인증 불필요</span></div>
   <p>인덱싱된 법률 데이터 통계를 반환합니다.</p>
-  <pre><code>curl https://zugu.io:8000/api/search/stats</code><button class="copy-btn" onclick="copyCode(this)">복사</button></pre>
+  <pre><code>curl https://zugu.io/election/api/search/stats</code><button class="copy-btn" onclick="copyCode(this)">복사</button></pre>
 </div>
 
 <div class="card">
@@ -334,7 +334,7 @@ code {
 <div class="card">
   <div class="card-title">Claude / ChatGPT / Gemini</div>
   <p>아래 프롬프트를 AI에게 전달하면 됩니다:</p>
-  <pre><code id="ai-prompt">선거법 관련 질문에 답할 때 https://zugu.io:8000/api/search 를
+  <pre><code id="ai-prompt">선거법 관련 질문에 답할 때 https://zugu.io/election/api/search 를
 POST 호출하여 관련 법 조문을 검색한 뒤 근거로 활용해줘.
 요청 형식: {"query": "검색어", "top_k": 5, "expand_refs": true}</code><button class="copy-btn" onclick="copyCode(this)">복사</button></pre>
 </div>
@@ -347,9 +347,9 @@ POST 호출하여 관련 법 조문을 검색한 뒤 근거로 활용해줘.
   <div class="link-row">
     <a href="https://github.com/tokki1106/election-law-advisor">GitHub</a>
     <a href="https://tokki1106.github.io/election-law-advisor/">문서</a>
-    <a href="/docs">Swagger UI</a>
-    <a href="/redoc">ReDoc</a>
-    <a href="/">웹 서비스</a>
+    <a href="/election/docs">Swagger UI</a>
+    <a href="/election/redoc">ReDoc</a>
+    <a href="/election/">웹 서비스</a>
   </div>
   <p style="margin-top:12px">
     법률 데이터 출처: <a href="https://github.com/legalize-kr/legalize-kr">legalize-kr</a> |
@@ -369,7 +369,7 @@ function copyCode(btn) {
   setTimeout(() => { btn.textContent = '복사'; btn.classList.remove('copied'); }, 1500);
 }
 
-fetch('/api/search/stats')
+fetch('/election/api/search/stats')
   .then(r => r.json())
   .then(d => {
     document.getElementById('stat-total').textContent = d.total_chunks.toLocaleString();
