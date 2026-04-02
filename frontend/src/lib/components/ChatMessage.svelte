@@ -4,15 +4,16 @@
   import FeedbackButtons from './FeedbackButtons.svelte';
   import type { ChatTurn } from '$lib/stores/chat';
 
-  let { turn, conversationId, conservativeActive, liberalActive }: {
+  let { turn, conversationId, conservativeActive, liberalActive, turnIndex }: {
     turn: ChatTurn;
     conversationId: string;
     conservativeActive: boolean;
     liberalActive: boolean;
+    turnIndex?: number;
   } = $props();
 </script>
 
-<div class="chat-message">
+<div class="chat-message" id={turnIndex !== undefined ? `turn-${turnIndex}` : undefined}>
   <div class="user-question">
     <span class="q-icon">&#x1F4AC;</span>
     <span class="q-text">{turn.question}</span>
@@ -59,13 +60,14 @@
 <style>
   .chat-message {
     margin-bottom: 24px;
+    scroll-margin-top: 16px;
   }
 
   .user-question {
     display: flex;
     align-items: flex-start;
     gap: 8px;
-    background: white;
+    background: var(--bg-elevated);
     border-radius: 10px;
     padding: 14px 16px;
     margin-bottom: 12px;
@@ -89,10 +91,13 @@
     display: flex;
     gap: 10px;
     margin-bottom: 8px;
+    align-items: stretch;
   }
 
   .agent-col {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
   }
 </style>

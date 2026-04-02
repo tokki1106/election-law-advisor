@@ -45,8 +45,9 @@
   .agent-box {
     border-radius: 12px;
     padding: 20px;
-    margin-bottom: 8px;
-    transition: box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
   }
 
   .header {
@@ -57,6 +58,7 @@
     font-weight: 600;
     font-size: 14px;
     letter-spacing: -0.01em;
+    flex-shrink: 0;
   }
 
   .icon {
@@ -82,6 +84,9 @@
     line-height: 1.75;
     word-break: keep-all;
     overflow-wrap: break-word;
+    max-height: 400px;
+    overflow-y: auto;
+    flex: 1;
   }
 
   .analyzing {
@@ -95,13 +100,14 @@
     gap: 6px;
     margin-top: 14px;
     padding-top: 12px;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    border-top: 1px solid rgba(128, 128, 128, 0.12);
+    flex-shrink: 0;
   }
 
   .tag {
     display: inline-block;
     padding: 3px 10px;
-    background: rgba(0, 0, 0, 0.05);
+    background: rgba(128, 128, 128, 0.08);
     border-radius: 6px;
     font-size: 12px;
     color: var(--text-muted);

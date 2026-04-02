@@ -3,6 +3,7 @@
   import Sidebar from '$lib/components/Sidebar.svelte';
   import ModeSelector from '$lib/components/ModeSelector.svelte';
   import ChatMessage from '$lib/components/ChatMessage.svelte';
+  import TurnNavigator from '$lib/components/TurnNavigator.svelte';
   import {
     createConversation,
     getConversation,
@@ -23,12 +24,14 @@
     resetChat,
   } from '$lib/stores/chat';
   import type { ChatTurn } from '$lib/stores/chat';
+  import { theme, toggleTheme, initTheme } from '$lib/stores/theme';
 
   let inputText = $state('');
   let chatAreaEl: HTMLDivElement | undefined = $state();
-  let textareaEl: HTMLTextAreaElement | undefined = $state();
+  let activeTurnIndex = $state(-1);
 
   onMount(() => {
+    initTheme();
     refreshConversations();
   });
 
@@ -36,6 +39,14 @@
     await tick();
     if (chatAreaEl) {
       chatAreaEl.scrollTop = chatAreaEl.scrollHeight;
+    }
+  }
+
+  function scrollToTurn(index: number) {
+    activeTurnIndex = index;
+    const el = document.getElementById(`turn-${index}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
 
@@ -51,16 +62,17 @@
   function handleNewChat() {
     activeConversationId.set(null);
     resetChat();
+    activeTurnIndex = -1;
   }
 
   async function handleSelectConversation(id: string) {
     activeConversationId.set(id);
     resetChat();
+    activeTurnIndex = -1;
 
     const data = await getConversation(id);
     conversationMode.set(data.conversation.mode);
 
-    // Group messages into ChatTurns
     const turns: ChatTurn[] = [];
     let currentGroup: Message[] = [];
 
@@ -207,7 +219,6 @@
           };
         });
 
-        // Move completed turn to history
         currentTurn.update(t => {
           if (t) {
             chatHistory.update(h => [...h, {
@@ -253,11 +264,16 @@
       <ModeSelector onSelect={handleModeSelect} />
     {:else}
       <div class="chat-container">
-        {#if $conversationMode}
-          <div class="mode-indicator">
-            {modeLabels[$conversationMode] || $conversationMode}
-          </div>
-        {/if}
+        <div class="top-bar">
+          {#if $conversationMode}
+            <span class="mode-label">
+              {modeLabels[$conversationMode] || $conversationMode}
+            </span>
+          {/if}
+          <button class="theme-toggle" onclick={toggleTheme} title={$theme === 'light' ? '다크 모드' : '라이트 모드'}>
+            {$theme === 'light' ? '🌙' : '☀️'}
+          </button>
+        </div>
 
         <div class="chat-area" bind:this={chatAreaEl}>
           <div class="chat-content">
@@ -267,6 +283,7 @@
                 conversationId={$activeConversationId}
                 conservativeActive={false}
                 liberalActive={false}
+                turnIndex={i}
               />
             {/each}
 
@@ -276,15 +293,21 @@
                 conversationId={$activeConversationId}
                 conservativeActive={$activePhase === 'conservative'}
                 liberalActive={$activePhase === 'liberal'}
+                turnIndex={$chatHistory.length}
               />
             {/if}
           </div>
         </div>
 
+        <TurnNavigator
+          turns={$chatHistory}
+          {activeTurnIndex}
+          onSelect={scrollToTurn}
+        />
+
         <div class="input-area">
           <div class="input-wrapper">
             <textarea
-              bind:this={textareaEl}
               bind:value={inputText}
               onkeydown={handleKeydown}
               placeholder="선거법에 대해 질문하세요..."
@@ -302,6 +325,12 @@
         </div>
       </div>
     {/if}
+
+    {#if !$activeConversationId}
+      <button class="theme-toggle floating" onclick={toggleTheme} title={$theme === 'light' ? '다크 모드' : '라이트 모드'}>
+        {$theme === 'light' ? '🌙' : '☀️'}
+      </button>
+    {/if}
   </main>
 </div>
 
@@ -317,6 +346,7 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    position: relative;
   }
 
   .chat-container {
@@ -326,25 +356,61 @@
     overflow: hidden;
   }
 
-  .mode-indicator {
-    padding: 10px 20px;
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 20px;
     background: var(--sidebar-bg);
     border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .mode-label {
     font-size: 13px;
     font-weight: 500;
     color: var(--text-muted);
-    text-align: center;
-    flex-shrink: 0;
+  }
+
+  .theme-toggle {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: background 0.15s;
+  }
+
+  .theme-toggle:hover {
+    background: var(--hover);
+  }
+
+  .theme-toggle.floating {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 100;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 8px var(--shadow);
   }
 
   .chat-area {
     flex: 1;
     overflow-y: auto;
     padding: 24px;
+    padding-right: 48px;
   }
 
   .chat-content {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
   }
 
@@ -356,7 +422,7 @@
   }
 
   .input-wrapper {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
     display: flex;
     gap: 10px;
@@ -369,7 +435,7 @@
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: 12px 16px;
-    background: white;
+    background: var(--bg-elevated);
     font-size: 14px;
     line-height: 1.5;
     min-height: 44px;

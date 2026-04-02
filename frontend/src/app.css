@@ -1,7 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
 
+/* ─── Light theme (default) ─── */
 :root {
 	--bg: #FAF9F6;
+	--bg-elevated: #FFFFFF;
 	--sidebar-bg: #F0EDE8;
 	--accent: #DA7756;
 	--accent-light: #FDF6F0;
@@ -16,6 +18,32 @@
 	--danger: #C4463A;
 	--border: #E0DCD7;
 	--hover: #E8E3DD;
+	--code-bg: rgba(0, 0, 0, 0.05);
+	--shadow: rgba(0, 0, 0, 0.08);
+	--menu-bg: #FFFFFF;
+}
+
+/* ─── Dark theme ─── */
+[data-theme="dark"] {
+	--bg: #1A1A1E;
+	--bg-elevated: #242428;
+	--sidebar-bg: #1E1E22;
+	--accent: #E08A6D;
+	--accent-light: #2A2220;
+	--text: #E4E0DC;
+	--text-muted: #8A8580;
+	--conservative-bg: #2A2622;
+	--liberal-bg: #26242A;
+	--consensus-border: #E08A6D;
+	--consensus-bg: #2A2220;
+	--safe: #5EA882;
+	--caution: #D4A53A;
+	--danger: #D4564A;
+	--border: #333338;
+	--hover: #2C2C30;
+	--code-bg: rgba(255, 255, 255, 0.06);
+	--shadow: rgba(0, 0, 0, 0.3);
+	--menu-bg: #2A2A2E;
 }
 
 * {
@@ -33,6 +61,7 @@ html, body {
 	line-height: 1.6;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+	transition: background 0.25s, color 0.25s;
 }
 
 button {
@@ -125,13 +154,13 @@ input, textarea {
 .markdown-body code {
 	font-family: 'SF Mono', Menlo, monospace;
 	font-size: 0.88em;
-	background: rgba(0, 0, 0, 0.05);
+	background: var(--code-bg);
 	padding: 0.15em 0.4em;
 	border-radius: 4px;
 }
 
 .markdown-body pre {
-	background: rgba(0, 0, 0, 0.04);
+	background: var(--code-bg);
 	padding: 12px 16px;
 	border-radius: 8px;
 	overflow-x: auto;
@@ -168,7 +197,7 @@ input, textarea {
 }
 
 .markdown-body th {
-	background: rgba(0, 0, 0, 0.03);
+	background: var(--code-bg);
 	font-weight: 600;
 }
 

@@ -340,7 +340,7 @@
     left: 12px;
     top: 100%;
     z-index: 100;
-    background: white;
+    background: var(--menu-bg);
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 4px 0;
