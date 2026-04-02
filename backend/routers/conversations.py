@@ -62,7 +62,7 @@ async def get_conversation(conv_id: str):
     db = await get_db()
     try:
         cursor = await db.execute(
-            "SELECT id, title, mode, pinned, folder, created_at FROM conversations WHERE id = ?",
+            "SELECT id, title, mode, pinned, folder, created_at, updated_at FROM conversations WHERE id = ?",
             (conv_id,),
         )
         conv = await cursor.fetchone()
