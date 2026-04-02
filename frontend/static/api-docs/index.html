@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>선거법 RAG API</title>
 <meta name="description" content="한국 선거법 조문 + 사례예시집 검색 API — 인증 불필요, 무료 공개">
-<link rel="icon" type="image/png" href="/election/favicon.png">
+<link rel="icon" type="image/png" href="/favicon.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="선거법 RAG API — Election Law Advisor">
 <meta property="og:description" content="한국 선거법 조문 + 사례예시집 1,877건 검색 API. 인증 불필요, 무료 공개.">
 <meta property="og:image" content="https://zugu.io/election/og-image.png">
-<meta property="og:url" content="https://zugu.io/election/api-docs/">
+<meta property="og:url" content="/api-docs/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="선거법 RAG API">
 <meta name="twitter:image" content="https://zugu.io/election/og-image.png">
@@ -283,7 +283,7 @@ code {
 }</code><button class="copy-btn" onclick="copyCode(this)">복사</button></pre>
 
   <p style="margin-top:12px"><strong>curl 예시:</strong></p>
-  <pre><code id="curl-example">curl -X POST https://zugu.io/election/api/search \
+  <pre><code id="curl-example">curl -X POST https://election.zugu.io/api/search \
   -H "Content-Type: application/json" \
   -d '{"query":"기부행위 제한","top_k":5,"expand_refs":true}'</code><button class="copy-btn" onclick="copyCode(this)">복사</button></pre>
 
@@ -316,7 +316,7 @@ code {
 <div class="card">
   <div class="card-title"><span class="endpoint-method method-get">GET</span> /api/search/stats <span class="badge badge-open">인증 불필요</span></div>
   <p>인덱싱된 법률 데이터 통계를 반환합니다.</p>
-  <pre><code>curl https://zugu.io/election/api/search/stats</code><button class="copy-btn" onclick="copyCode(this)">복사</button></pre>
+  <pre><code>curl https://election.zugu.io/api/search/stats</code><button class="copy-btn" onclick="copyCode(this)">복사</button></pre>
 </div>
 
 <div class="card">
@@ -344,7 +344,7 @@ code {
 <div class="card">
   <div class="card-title">Claude / ChatGPT / Gemini</div>
   <p>아래 프롬프트를 AI에게 전달하면 됩니다:</p>
-  <pre><code id="ai-prompt">선거법 관련 질문에 답할 때 https://zugu.io/election/api/search 를
+  <pre><code id="ai-prompt">선거법 관련 질문에 답할 때 https://election.zugu.io/api/search 를
 POST 호출하여 관련 법 조문을 검색한 뒤 근거로 활용해줘.
 요청 형식: {"query": "검색어", "top_k": 5, "expand_refs": true}</code><button class="copy-btn" onclick="copyCode(this)">복사</button></pre>
 </div>
@@ -357,9 +357,9 @@ POST 호출하여 관련 법 조문을 검색한 뒤 근거로 활용해줘.
   <div class="link-row">
     <a href="https://github.com/tokki1106/election-law-advisor">GitHub</a>
     <a href="https://tokki1106.github.io/election-law-advisor/">문서</a>
-    <a href="https://zugu.io/election/docs">Swagger UI</a>
-    <a href="https://zugu.io/election/redoc">ReDoc</a>
-    <a href="https://zugu.io/election/">웹 서비스</a>
+    <a href="/docs">Swagger UI</a>
+    <a href="/redoc">ReDoc</a>
+    <a href="/">웹 서비스</a>
   </div>
   <p style="margin-top:12px">
     법률 데이터 출처: <a href="https://github.com/legalize-kr/legalize-kr">legalize-kr</a> |
@@ -379,7 +379,7 @@ function copyCode(btn) {
   setTimeout(() => { btn.textContent = '복사'; btn.classList.remove('copied'); }, 1500);
 }
 
-fetch('/election/api/search/stats')
+fetch('/api/search/stats')
   .then(r => r.json())
   .then(d => {
     document.getElementById('stat-total').textContent = d.total_chunks.toLocaleString();
