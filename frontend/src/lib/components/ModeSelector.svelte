@@ -60,11 +60,11 @@
     flex-direction: column;
     align-items: center;
     gap: 12px;
-    padding: 32px 28px;
+    padding: 36px 32px;
     border: 2px solid var(--border);
     border-radius: 12px;
     background: var(--bg-elevated);
-    width: 240px;
+    width: 280px;
     transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
   }
 
@@ -84,9 +84,10 @@
   }
 
   .desc {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--text-muted);
     text-align: center;
     line-height: 1.5;
+    word-break: keep-all;
   }
 </style>
