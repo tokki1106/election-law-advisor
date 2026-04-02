@@ -1,10 +1,19 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from backend.database import init_db
 
 load_dotenv()
 
-app = FastAPI(title="선거법 자문 서비스")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await init_db()
+    yield
+
+
+app = FastAPI(title="선거법 자문 서비스", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
