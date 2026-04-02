@@ -249,4 +249,4 @@ election-law-advisor/
 - [legalize-kr](https://github.com/legalize-kr/legalize-kr) - 한국 법령 Git 저장소
 - [중앙선거관리위원회](https://www.nec.go.kr/) - 정치관계법 사례예시집
 - [OpenRouter](https://openrouter.ai) - LLM API 게이트웨이
-- [네이미 챗봇 개발자 커뮤니티](https://cafe.naver.com/nameyee) - 챗봇 개발 커뮤니티
+- [네이버 카페- 챗봇 개발자 커뮤니티](https://cafe.naver.com/nameyee) - 챗봇 개발 커뮤니티
