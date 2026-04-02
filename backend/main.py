@@ -1,6 +1,8 @@
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from backend.database import init_db
 
@@ -34,3 +36,14 @@ app.include_router(feedback.router)
 @app.get("/api/health")
 async def health():
     return {"status": "ok"}
+
+
+FRONTEND_BUILD = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)), "frontend", "build"
+)
+
+# This must be the LAST mount — it catches all non-API routes
+if os.path.isdir(FRONTEND_BUILD):
+    app.mount(
+        "/", StaticFiles(directory=FRONTEND_BUILD, html=True), name="frontend"
+    )
