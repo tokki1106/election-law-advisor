@@ -9,10 +9,7 @@ from backend.rag.cross_ref import extract_cross_references
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 LAWS_DIR = os.path.join(DATA_DIR, "laws", "repo", "kr")
-CASE_FILE = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-    "정치관계법_사례예시집.md",
-)
+CASE_FILE = os.path.join(DATA_DIR, "정치관계법_사례예시집.md")
 CHROMA_DIR = os.path.join(DATA_DIR, "chroma_db")
 BM25_DIR = os.path.join(DATA_DIR, "bm25_index")
 

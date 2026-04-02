@@ -157,6 +157,8 @@ election-law-advisor/
     index_laws.py        # 인덱싱 실행 래퍼
   start.sh               # 서버 시작 스크립트
   .env.example           # 환경 변수 템플릿
+  backend/data/
+    정치관계법_사례예시집.md  # 중앙선관위 사례집 (838건)
 ```
 
 ## API 엔드포인트
