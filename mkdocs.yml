@@ -1,0 +1,61 @@
+site_name: 선거법 자문 에이전트
+site_description: AI 기반 한국 선거법 위반 여부 판단 서비스
+site_url: https://tokki1106.github.io/election-law-advisor/
+repo_url: https://github.com/tokki1106/election-law-advisor
+repo_name: tokki1106/election-law-advisor
+
+theme:
+  name: material
+  language: ko
+  palette:
+    - scheme: default
+      primary: deep orange
+      accent: deep orange
+      toggle:
+        icon: material/brightness-7
+        name: 다크 모드로 전환
+    - scheme: slate
+      primary: deep orange
+      accent: deep orange
+      toggle:
+        icon: material/brightness-4
+        name: 라이트 모드로 전환
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - tables
+  - attr_list
+  - md_in_html
+
+nav:
+  - 홈: index.md
+  - 시작하기:
+    - 설치 가이드: getting-started/installation.md
+    - API 키 설정: getting-started/api-key.md
+  - 사용법:
+    - 기본 사용법: usage/basic.md
+    - 위험도 등급: usage/risk-levels.md
+  - 아키텍처:
+    - 전체 구조: architecture/overview.md
+    - RAG 파이프라인: architecture/rag.md
+    - 듀얼 에이전트: architecture/agents.md
+  - API 레퍼런스: api/endpoints.md
