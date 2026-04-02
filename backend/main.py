@@ -24,6 +24,12 @@ app.add_middleware(
 )
 
 
+from backend.routers import conversations, feedback
+
+app.include_router(conversations.router)
+app.include_router(feedback.router)
+
+
 @app.get("/api/health")
 async def health():
     return {"status": "ok"}
