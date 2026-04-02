@@ -19,6 +19,7 @@ PUBLIC_PATHS = {
     "/openapi.json",
     "/api/health",
     "/api/search/stats",
+    "/api/search",
 }
 
 # 프리픽스 기반 공개 경로 (정적 파일 등)
@@ -26,6 +27,7 @@ PUBLIC_PREFIXES = (
     "/_app/",
     "/favicon",
     "/robots",
+    "/api-docs",
 )
 
 

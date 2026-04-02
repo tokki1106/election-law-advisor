@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>선거법 RAG API</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css" rel="stylesheet">
+<style>
+:root {
+  --bg: #f2ead3;
+  --bg-soft: #ede4cb;
+  --surface: #f7ecd2;
+  --ink: #3b2f20;
+  --ink-muted: #7a6b54;
+  --border: #c2a676;
+  --accent: #9b7c4d;
+  --green: #2f6b4e;
+  --hover-bg: #3b2f20;
+  --hover-text: #f2ead3;
+  --code-bg: #3b2f20;
+  --code-text: #f2ead3;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  font-family: "Pretendard Variable", -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 15px;
+  color: var(--ink-muted);
+  margin-bottom: 40px;
+}
+
+.stats {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 20px;
+  flex: 1;
+  min-width: 140px;
+  box-shadow: 4px 4px 0 rgba(59,47,32,0.1);
+}
+
+.stat-num {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.stat-label {
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+
+.card {
+  background: var(--surface);
+  border: 3px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+  margin-bottom: 20px;
+  box-shadow: 8px 8px 0 rgba(59,47,32,0.12);
+  transition: transform 80ms, box-shadow 80ms;
+}
+
+.card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 10px 10px 0 rgba(59,47,32,0.15);
+}
+
+.card-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.badge-open { background: #d4edda; color: var(--green); }
+.badge-post { background: #fff3cd; color: #856404; }
+
+.card p, .card li {
+  font-size: 14px;
+  color: var(--ink-muted);
+  line-height: 1.7;
+}
+
+.card ul {
+  padding-left: 20px;
+  margin: 8px 0;
+}
+
+pre {
+  background: var(--code-bg);
+  color: var(--code-text);
+  border-radius: 10px;
+  padding: 16px 20px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 12px 0;
+  position: relative;
+}
+
+code {
+  font-family: "SF Mono", Menlo, monospace;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s;
+}
+
+.copy-btn:hover { opacity: 0.8; }
+.copy-btn.copied { background: var(--green); }
+
+.endpoint {
+  margin-bottom: 16px;
+}
+
+.endpoint-method {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-right: 6px;
+}
+
+.method-get { background: #d4edda; color: var(--green); }
+.method-post { background: #fff3cd; color: #856404; }
+
+.endpoint-path {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.endpoint-desc {
+  font-size: 13px;
+  color: var(--ink-muted);
+  margin-top: 2px;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 48px 0 20px;
+  letter-spacing: -0.02em;
+}
+
+.notice {
+  background: #fff8e1;
+  border: 2px solid #f0d58c;
+  border-radius: 10px;
+  padding: 16px 20px;
+  font-size: 13px;
+  color: var(--ink-muted);
+  margin: 24px 0;
+}
+
+.notice strong { color: var(--ink); }
+
+.footer {
+  margin-top: 60px;
+  padding-top: 24px;
+  border-top: 2px solid var(--border);
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+
+.footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.footer a:hover { text-decoration: underline; }
+
+.link-row {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+@media (max-width: 600px) {
+  .container { padding: 32px 16px 60px; }
+  h1 { font-size: 24px; }
+  .stats { flex-direction: column; }
+  .card { padding: 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>선거법 RAG API</h1>
+<p class="subtitle">한국 선거법 조문 + 사례예시집 검색 API — 인증 불필요, 무료 공개</p>
+
+<div class="stats" id="stats">
+  <div class="stat"><div class="stat-num" id="stat-total">-</div><div class="stat-label">전체 청크</div></div>
+  <div class="stat"><div class="stat-num" id="stat-law">-</div><div class="stat-label">법률 조문</div></div>
+  <div class="stat"><div class="stat-num" id="stat-case">-</div><div class="stat-label">사례예시집</div></div>
+  <div class="stat"><div class="stat-num" id="stat-ref">-</div><div class="stat-label">상호참조</div></div>
+</div>
+
+<div class="card">
+  <div class="card-title">검색 범위</div>
+  <ul>
+    <li>공직선거법 (법률 + 시행령 + 시행규칙)</li>
+    <li>정치자금법 (법률 + 시행령 + 시행규칙)</li>
+    <li>정당법 (법률 + 시행령 + 시행규칙)</li>
+    <li>공직선거관리규칙</li>
+    <li>중앙선관위 정치관계법 사례예시집 (838건)</li>
+  </ul>
+  <p style="margin-top:10px">Hybrid Retrieval: BM25 키워드 + 벡터 시맨틱 + RRF 병합 + 조문 상호참조 자동 확장</p>
+</div>
+
+<h2 class="section-title">API 엔드포인트</h2>
+
+<div class="card">
+  <div class="card-title"><span class="endpoint-method method-post">POST</span> /api/search <span class="badge badge-open">인증 불필요</span></div>
+  <p>선거 관련 법률 조문과 사례를 검색합니다.</p>
+
+  <pre><code>{
+  "query": "기부행위 제한",
+  "top_k": 5,
+  "expand_refs": true
+}</code><button class="copy-btn" onclick="copyCode(this)">복사</button></pre>
+
+  <p style="margin-top:12px"><strong>curl 예시:</strong></p>
+  <pre><code id="curl-example">curl -X POST https://zugu.io:8000/api/search \
+  -H "Content-Type: application/json" \
+  -d '{"query":"기부행위 제한","top_k":5,"expand_refs":true}'</code><button class="copy-btn" onclick="copyCode(this)">복사</button></pre>
+
+  <p style="margin-top:12px"><strong>응답 예시:</strong></p>
+  <pre><code>{
+  "query": "기부행위 제한",
+  "total": 7,
+  "results": [
+    {
+      "id": "공직선거법_법률__제112조",
+      "text": "제112조 (기부행위의 정의) ...",
+      "metadata": {
+        "law_name": "공직선거법_법률",
+        "article": "제112조",
+        "type": "law"
+      }
+    },
+    {
+      "id": "case__0497",
+      "text": "예비후보자가 군청, 경찰서 등...",
+      "metadata": {
+        "judgment": "prohibited",
+        "type": "case_example"
+      }
+    }
+  ]
+}</code></pre>
+</div>
+
+<div class="card">
+  <div class="card-title"><span class="endpoint-method method-get">GET</span> /api/search/stats <span class="badge badge-open">인증 불필요</span></div>
+  <p>인덱싱된 법률 데이터 통계를 반환합니다.</p>
+  <pre><code>curl https://zugu.io:8000/api/search/stats</code><button class="copy-btn" onclick="copyCode(this)">복사</button></pre>
+</div>
+
+<div class="card">
+  <div class="card-title"><span class="endpoint-method method-get">GET</span> /api/health</div>
+  <p>서버 상태 확인</p>
+</div>
+
+<h2 class="section-title">파라미터</h2>
+
+<div class="card">
+  <table style="width:100%; font-size:14px; border-collapse:collapse;">
+    <tr style="border-bottom:2px solid var(--border);">
+      <th style="text-align:left; padding:8px 0;">파라미터</th>
+      <th style="text-align:left; padding:8px 0;">기본값</th>
+      <th style="text-align:left; padding:8px 0;">설명</th>
+    </tr>
+    <tr><td style="padding:6px 0;"><code>query</code></td><td>필수</td><td>검색 쿼리 (한국어)</td></tr>
+    <tr><td style="padding:6px 0;"><code>top_k</code></td><td>10</td><td>반환 결과 수 (1~50)</td></tr>
+    <tr><td style="padding:6px 0;"><code>expand_refs</code></td><td>true</td><td>상호참조 조문 자동 확장</td></tr>
+  </table>
+</div>
+
+<h2 class="section-title">AI 에이전트 연동</h2>
+
+<div class="card">
+  <div class="card-title">Claude / ChatGPT / Gemini</div>
+  <p>아래 프롬프트를 AI에게 전달하면 됩니다:</p>
+  <pre><code id="ai-prompt">선거법 관련 질문에 답할 때 https://zugu.io:8000/api/search 를
+POST 호출하여 관련 법 조문을 검색한 뒤 근거로 활용해줘.
+요청 형식: {"query": "검색어", "top_k": 5, "expand_refs": true}</code><button class="copy-btn" onclick="copyCode(this)">복사</button></pre>
+</div>
+
+<div class="notice">
+  <strong>개인정보 보호:</strong> 이 API는 IP 주소, 검색 쿼리를 로깅하지 않습니다. 인증 없이 익명으로 사용 가능합니다. LLM 호출이 포함되지 않으므로 비용이 발생하지 않습니다.
+</div>
+
+<div class="footer">
+  <div class="link-row">
+    <a href="https://github.com/tokki1106/election-law-advisor">GitHub</a>
+    <a href="https://tokki1106.github.io/election-law-advisor/">문서</a>
+    <a href="/docs">Swagger UI</a>
+    <a href="/redoc">ReDoc</a>
+    <a href="/">웹 서비스</a>
+  </div>
+  <p style="margin-top:12px">
+    법률 데이터 출처: <a href="https://github.com/legalize-kr/legalize-kr">legalize-kr</a> |
+    사례예시집: <a href="https://www.nec.go.kr/">중앙선거관리위원회</a>
+  </p>
+  <p style="margin-top:4px">문의: nameyee1106@kakao.com | <a href="https://cafe.naver.com/nameyee">커뮤니티</a></p>
+</div>
+
+</div>
+
+<script>
+function copyCode(btn) {
+  const code = btn.parentElement.querySelector('code');
+  navigator.clipboard.writeText(code.textContent.trim());
+  btn.textContent = '복사됨';
+  btn.classList.add('copied');
+  setTimeout(() => { btn.textContent = '복사'; btn.classList.remove('copied'); }, 1500);
+}
+
+fetch('/api/search/stats')
+  .then(r => r.json())
+  .then(d => {
+    document.getElementById('stat-total').textContent = d.total_chunks.toLocaleString();
+    document.getElementById('stat-law').textContent = d.law_chunks.toLocaleString();
+    document.getElementById('stat-case').textContent = d.case_example_chunks.toLocaleString();
+    document.getElementById('stat-ref').textContent = d.cross_references.toLocaleString();
+  })
+  .catch(() => {});
+</script>
+
+</body>
+</html>
