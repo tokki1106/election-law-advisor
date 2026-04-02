@@ -1,0 +1,15 @@
+fastapi==0.115.12
+uvicorn[standard]==0.34.2
+python-dotenv==1.1.0
+langchain==0.3.25
+langchain-community==0.3.24
+langgraph==0.4.1
+langchain-openai==0.3.18
+chromadb==1.0.10
+sentence-transformers==4.1.0
+rank-bm25==0.2.2
+aiosqlite==0.21.0
+aiofiles==24.1.0
+sse-starlette==2.3.3
+pydantic==2.11.3
+httpx==0.28.1

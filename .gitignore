@@ -1,2 +1,11 @@
 .env
 node_modules/
+__pycache__/
+*.pyc
+backend/data/chroma_db/
+backend/data/bm25_index/
+backend/data/legal.db
+backend/data/laws/
+.svelte-kit/
+build/
+venv/
