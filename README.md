@@ -37,17 +37,28 @@
 
 - Python 3.12+
 - Node.js 20+
-- [OpenRouter API 키](https://openrouter.ai/keys)
+- OpenRouter API 키 (아래 발급 방법 참고)
+
+### OpenRouter API 키 발급
+
+이 서비스는 [OpenRouter](https://openrouter.ai)를 통해 Gemini 3.1 Flash Lite 모델을 사용합니다.
+
+1. [openrouter.ai](https://openrouter.ai) 에 접속하여 회원가입
+2. [API Keys 페이지](https://openrouter.ai/keys) 에서 **Create Key** 클릭
+3. 생성된 키 (`sk-or-v1-...` 형식)를 복사
+4. 프로젝트의 `.env` 파일에 붙여넣기
+
+무료 크레딧이 제공되며, 이후 사용량에 따라 과금됩니다. Gemini 3.1 Flash Lite는 저렴한 모델이므로 일반적인 사용에는 큰 비용이 발생하지 않습니다.
 
 ### 설치
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/legal.git
-cd legal
+git clone https://github.com/tokki1106/election-law-advisor.git
+cd election-law-advisor
 
 # 1. 환경 변수 설정
 cp .env.example .env
-# .env 파일을 열어 OPENROUTER_API_KEY에 본인 API 키 입력
+# .env 파일을 열어 OPENROUTER_API_KEY에 발급받은 API 키 입력
 
 # 2. Python 의존성 설치
 python3 -m venv venv
