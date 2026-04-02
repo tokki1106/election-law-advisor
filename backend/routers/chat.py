@@ -2,17 +2,12 @@ import uuid
 import json
 import asyncio
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from backend.schemas import ChatRequest
 from sse_starlette.sse import EventSourceResponse
 from backend.database import get_db
 from backend.agents.graph import run_agent_workflow
 
-router = APIRouter(prefix="/api", tags=["chat"])
-
-
-class ChatRequest(BaseModel):
-    conversation_id: str
-    question: str
+router = APIRouter(prefix="/api", tags=["채팅"])
 
 
 async def _save_responses(
@@ -57,7 +52,20 @@ async def _save_responses(
         await db.close()
 
 
-@router.post("/chat")
+@router.post(
+    "/chat",
+    summary="선거법 자문 (SSE 스트리밍)",
+    description=(
+        "질문을 보내면 두 에이전트(보수/관용)가 동시에 분석하고 합의를 도출합니다.\n\n"
+        "응답은 Server-Sent Events(SSE)로 스트리밍됩니다.\n\n"
+        "**SSE 이벤트 종류:**\n"
+        "- `conservative_start` / `liberal_start` — 에이전트 분석 시작\n"
+        "- `conservative_token` / `liberal_token` — 토큰 단위 스트리밍 `{token: '...'}`\n"
+        "- `conservative_end` / `liberal_end` — 분석 완료 `{cited_articles: [...]}`\n"
+        "- `consensus` — 합의 결론 `{content, risk_level, cited_articles, request_feedback}`\n\n"
+        "**위험도 등급:** safe(안전) / caution(주의) / danger(위반가능)"
+    ),
+)
 async def chat(body: ChatRequest):
     db = await get_db()
     try:

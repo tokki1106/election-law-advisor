@@ -1,20 +1,16 @@
 import uuid
 from fastapi import APIRouter
-from pydantic import BaseModel
 from backend.database import get_db
+from backend.schemas import FeedbackCreate, FeedbackOut
 
-router = APIRouter(prefix="/api/feedback", tags=["feedback"])
-
-
-class FeedbackCreate(BaseModel):
-    conversation_id: str
-    user_question: str
-    bot_response: str
-    risk_level: str | None = None
-    rating: str  # 'up' | 'down'
+router = APIRouter(prefix="/api/feedback", tags=["피드백"])
 
 
-@router.post("")
+@router.post(
+    "",
+    summary="응답 평가 저장",
+    description="사용자가 봇 응답에 대해 좋아요/싫어요 평가를 제출합니다.",
+)
 async def create_feedback(body: FeedbackCreate):
     fb_id = str(uuid.uuid4())
     db = await get_db()
@@ -29,7 +25,12 @@ async def create_feedback(body: FeedbackCreate):
         await db.close()
 
 
-@router.get("")
+@router.get(
+    "",
+    response_model=list[FeedbackOut],
+    summary="피드백 목록 조회",
+    description="수집된 모든 피드백을 최신순으로 반환합니다. 관리/분석용 엔드포인트입니다.",
+)
 async def list_feedbacks():
     db = await get_db()
     try:
