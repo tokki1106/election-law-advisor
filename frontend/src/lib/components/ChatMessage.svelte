@@ -100,4 +100,10 @@
     display: flex;
     flex-direction: column;
   }
+
+  @media (max-width: 768px) {
+    .agents-row {
+      flex-direction: column;
+    }
+  }
 </style>

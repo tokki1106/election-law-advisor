@@ -90,4 +90,24 @@
     line-height: 1.5;
     word-break: keep-all;
   }
+
+  @media (max-width: 768px) {
+    .mode-selector {
+      padding: 0 24px;
+    }
+
+    .cards {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .card {
+      width: 100%;
+      padding: 24px 20px;
+    }
+
+    .title {
+      font-size: 22px;
+    }
+  }
 </style>

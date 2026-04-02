@@ -31,6 +31,7 @@
   let inputText = $state('');
   let chatAreaEl: HTMLDivElement | undefined = $state();
   let activeTurnIndex = $state(-1);
+  let sidebarOpen = $state(false);
 
   onMount(() => {
     initTheme();
@@ -243,11 +244,18 @@
   };
 </script>
 
+{#if sidebarOpen}
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <div class="mobile-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:90;" onclick={() => sidebarOpen = false} onkeydown={() => {}}></div>
+{/if}
+
 <div class="app-layout">
-  <Sidebar
-    onSelectConversation={handleSelectConversation}
-    onNewChat={handleNewChat}
-  />
+  <div class="sidebar-mobile-wrap" class:open={sidebarOpen}>
+    <Sidebar
+      onSelectConversation={(id) => { sidebarOpen = false; handleSelectConversation(id); }}
+      onNewChat={() => { sidebarOpen = false; handleNewChat(); }}
+    />
+  </div>
 
   <main class="main-area">
     {#if !$activeConversationId}
@@ -255,6 +263,13 @@
     {:else}
       <div class="chat-container">
         <div class="top-bar">
+          <button class="mobile-menu-btn" style="display:none; position:absolute; left:12px; top:50%; transform:translateY(-50%); padding:6px; border-radius:6px; color:var(--text-muted);" onclick={() => sidebarOpen = !sidebarOpen}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
           {#if $conversationMode}
             <span class="mode-label">
               {modeLabels[$conversationMode] || $conversationMode}
@@ -317,7 +332,14 @@
     {/if}
 
     {#if !$activeConversationId}
-      <div class="theme-toggle-floating">
+      <div class="floating-controls">
+        <button class="mobile-menu-btn" style="display:none; padding:6px; border-radius:6px; color:var(--text-muted); background:var(--bg-elevated); border:1px solid var(--border);" onclick={() => sidebarOpen = !sidebarOpen}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
         <ThemeToggle />
       </div>
     {/if}
@@ -337,6 +359,7 @@
     flex-direction: column;
     overflow: hidden;
     position: relative;
+    min-width: 0;
   }
 
   .chat-container {
@@ -370,11 +393,14 @@
     transform: translateY(-50%);
   }
 
-  .theme-toggle-floating {
+  .floating-controls {
     position: fixed;
     top: 16px;
     right: 16px;
     z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .chat-area {
@@ -411,7 +437,7 @@
     border-radius: 10px;
     padding: 12px 16px;
     background: var(--bg-elevated);
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.5;
     min-height: 44px;
     max-height: 120px;
@@ -446,4 +472,10 @@
     opacity: 0.5;
     cursor: not-allowed;
   }
+
+  @media (max-width: 768px) { .chat-area { padding: 16px; } }
+  @media (max-width: 768px) { .input-area { padding: 12px 16px; } }
+  @media (max-width: 768px) { .input-wrapper { gap: 8px; } }
+  @media (max-width: 768px) { .send-btn { padding: 10px 14px; } }
+  @media (max-width: 768px) { .top-bar { padding: 8px 48px; } }
 </style>
